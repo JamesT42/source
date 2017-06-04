@@ -178,6 +178,11 @@ static struct board_info boards[] = {
 		.hw_rev		= 14,
 		.layout_id	= "8Mltq",
 	}, {
+		.id		= "TL-WR841Nv13",
+		.hw_id		= 0x08410013,
+		.hw_rev		= 1,
+		.layout_id	= "8Mltq",
+	}, {
 		.id		= "ArcherC20i",
 		.hw_id		= 0xc2000001,
 		.hw_rev		= 58,
@@ -535,7 +540,12 @@ static void fill_header(char *buf, int len)
 	hdr->boot_ofs = htonl(0);
 	hdr->boot_len = htonl(boot_info.file_size);
 
-	hdr->unk1 = htonl(0);
+	/*if (board->hw_id == "TL-WR841Nv13") {
+		hdr->unk1 = htonl(0x00000013);
+	} else {
+		hdr->unk1 = htonl(0);
+	} well that doesnt work for some reason*/
+	hdr->unk1 = htonl(0x00000013);     /*bad temporary hack*/
 	hdr->unk2 = htonl(0);
 	hdr->unk3 = htonl(0xffffffff);
 	hdr->unk4 = htons(0x55aa);

@@ -336,6 +336,11 @@ tiny-ac)
 	set_wifi_led "$board:orange:wifi"
 	set_usb_led "$board:green:usb"
 	;;
+tl-wr841n-v13)
+	set_wifi_led "$board:green:wireless"
+	ucidef_set_led_switch "lan" "lan" "$board:green:lan" "switch0" "0x1e"
+	ucidef_set_led_switch "wan" "wan" "$board:green:wan" "switch0" "0x01"
+	;;
 vocore-8M|\
 vocore-16M)
 	ucidef_set_led_netdev "eth" "ETH" "vocore:orange:eth" "eth0"

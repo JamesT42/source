@@ -2,6 +2,15 @@
 # MT7628 Profiles
 #
 
+define Build/tplink-header
+	$(STAGING_DIR_HOST)/bin/mktplinkfw2 -a 0x4 -V "ver. 2.0" -B $(1) \
+		-o $@.new -k $@ -r $(IMAGE_ROOTFS) && mv $@.new $@
+endef
+
+define Build/prepend-to
+    dd bs=1 seek=$(1) if=$@ of=$@.new && mv $@.new $@
+endef
+
 define Device/mt7628
   DTS := MT7628
   BLOCKSIZE := 64k
@@ -25,6 +34,21 @@ define Device/miwifi-nano
   DEVICE_PACKAGES := kmod-usb2 kmod-usb-ohci kmod-usb-ledtrig-usbport
 endef
 TARGET_DEVICES += miwifi-nano
+
+define Device/tl-wr841n-v13
+  DTS := TL-WR841NV13
+  IMAGE_SIZE := 7808k
+  DEVICE_TITLE := TP-Link TL-WR841N v13
+  SUPPORTED_DEVICES := tl-wr841nv13    # what to write here? tl-wr841nv13?
+  DEVICE_PACKAGES :=
+  KERNEL := $(KERNEL_DTB)
+  KERNEL_INITRAMFS := $(KERNEL_DTB) | tplink-header TL-WR841Nv13 -c   # untested
+  IMAGES += factory.bin factory2.bin
+  IMAGE/factory.bin := pad-extra 131072 | $$(sysupgrade_bin)
+  IMAGE/factory2.bin := append-kernel | tplink-header TL-WR841Nv13 -j
+  IMAGE/sysupgrade.bin := append-kernel | tplink-header TL-WR841Nv13 -j -s | append-metadata
+endef
+TARGET_DEVICES += tl-wr841n-v13
 
 define Device/gl-mt300n-v2
   DTS := GL-MT300N-V2
