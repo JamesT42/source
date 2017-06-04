@@ -26,6 +26,19 @@ define Device/miwifi-nano
 endef
 TARGET_DEVICES += miwifi-nano
 
+define Device/tl-wr841n-v13
+  DTS := TL-WR841NV13
+  IMAGE_SIZE := 7808k
+  DEVICE_TITLE := TP-Link TL-WR841N v13
+  DEVICE_PACKAGES :=
+  KERNEL := $(KERNEL_DTB) | prepend-to 448 | uImage lzma
+  IMAGES += factory.bin
+# IMAGE/factory.bin := pad-extra 131072 | $$(sysupgrade_bin)
+  IMAGE/factory.bin := append-kernel | tplink-header 841nv13 -j
+  IMAGE/sysupgrade.bin := append-kernel | tplink-header 841nv13 -j -s | append-metadata
+endef
+TARGET_DEVICES += tl-wr841n-v13
+
 define Device/gl-mt300n-v2
   DTS := GL-MT300N-V2
   IMAGE_SIZE := 16064k
