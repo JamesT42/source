@@ -2,6 +2,15 @@
 # MT7628 Profiles
 #
 
+define Build/tplink-header
+	$(STAGING_DIR_HOST)/bin/mktplinkfw2 -a 0x4 -V "ver. 2.0" -B $(1) \
+		-o $@.new -k $@ -r $(IMAGE_ROOTFS) && mv $@.new $@
+endef
+
+define Build/prepend-to
+    dd bs=1 seek=$(1) if=$@ of=$@.new && mv $@.new $@
+endef
+
 define Device/mt7628
   DTS := MT7628
   BLOCKSIZE := 64k
@@ -30,12 +39,14 @@ define Device/tl-wr841n-v13
   DTS := TL-WR841NV13
   IMAGE_SIZE := 7808k
   DEVICE_TITLE := TP-Link TL-WR841N v13
+  SUPPORTED_DEVICES := tl-wr841n-v13
   DEVICE_PACKAGES :=
   KERNEL := $(KERNEL_DTB) | prepend-to 448 | uImage lzma
-  IMAGES += factory.bin
-# IMAGE/factory.bin := pad-extra 131072 | $$(sysupgrade_bin)
-  IMAGE/factory.bin := append-kernel | tplink-header 841nv13 -j
-  IMAGE/sysupgrade.bin := append-kernel | tplink-header 841nv13 -j -s | append-metadata
+  # KERNEL_INITRAMFS := $(KERNEL_DTB) | tplink-header TL-WR841Nv13 -c        # untested
+  IMAGES += factory.bin tftp.bin
+  IMAGE/factory.bin := pad-extra 131584 | append-kernel | tplink-header TL-WR841Nv13 -j
+  IMAGE/sysupgrade.bin := append-kernel | tplink-header TL-WR841Nv13 -j -s | append-metadata
+  IMAGE/tftp.bin := pad-extra 131072 | $$(sysupgrade_bin)
 endef
 TARGET_DEVICES += tl-wr841n-v13
 
