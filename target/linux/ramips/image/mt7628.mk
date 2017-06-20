@@ -42,10 +42,8 @@ define Device/tl-wr841n-v13
   SUPPORTED_DEVICES := tl-wr841n-v13
   DEVICE_PACKAGES :=
   KERNEL := $(KERNEL_DTB) | prepend-to 448 | uImage lzma
-  # KERNEL_INITRAMFS := $(KERNEL_DTB) | tplink-header TL-WR841Nv13 -c        # untested
   IMAGES += factory.bin tftp.bin
-  IMAGE/factory.bin := pad-extra 131584 | append-kernel | tplink-header TL-WR841Nv13 -j
-  IMAGE/sysupgrade.bin := append-kernel | tplink-header TL-WR841Nv13 -j -s | append-metadata
+  IMAGE/factory.bin := append-kernel | tplink-header TL-WR841Nv13 -j -s | append-metadata
   IMAGE/tftp.bin := pad-extra 131072 | $$(sysupgrade_bin)
 endef
 TARGET_DEVICES += tl-wr841n-v13
