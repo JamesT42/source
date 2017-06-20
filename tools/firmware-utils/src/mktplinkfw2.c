@@ -43,7 +43,7 @@ struct fw_header {
 	char		fw_version[48]; /* 0x04: fw version string */
 	uint32_t	hw_id;		/* 0x34: hardware id */
 	uint32_t	hw_rev;		/* 0x38: FIXME: hardware revision? */
-	uint32_t	unk1;	        /* 0x3c: 0x00000000 */
+	uint32_t	unk1;	        /* 0x3c: FIXME: corresponds to rev on 841v13, otherwise 0 ? */
 	uint8_t		md5sum1[MD5SUM_LEN]; /* 0x40 */
 	uint32_t	unk2;		/* 0x50: 0x00000000 */
 	uint8_t		md5sum2[MD5SUM_LEN]; /* 0x54 */
@@ -83,6 +83,7 @@ struct board_info {
 	char		*layout_id;
 	uint32_t	hdr_ver;
 	bool		endian_swap;
+	uint32_t        unk1;
 };
 
 /*
@@ -104,6 +105,7 @@ static char *opt_hw_id;
 static uint32_t hw_id;
 static char *opt_hw_rev;
 static uint32_t hw_rev;
+static uint32_t unk1 = 0;
 static int fw_ver_lo;
 static int fw_ver_mid;
 static int fw_ver_hi;
@@ -182,6 +184,7 @@ static struct board_info boards[] = {
 		.hw_id		= 0x08410013,
 		.hw_rev		= 1,
 		.layout_id	= "8Mltq",
+                .unk1           = 0x00000013,
 	}, {
 		.id		= "ArcherC20i",
 		.hw_id		= 0xc2000001,
@@ -399,6 +402,8 @@ static int check_options(void)
 		if (board->hdr_ver)
 			hdr_ver = board->hdr_ver;
 		endian_swap = board->endian_swap;
+		if(board->unk1 )
+			unk1 =  board->unk1;
 	} else {
 		if (layout_id == NULL) {
 			ERR("flash layout is not specified");
@@ -540,12 +545,7 @@ static void fill_header(char *buf, int len)
 	hdr->boot_ofs = htonl(0);
 	hdr->boot_len = htonl(boot_info.file_size);
 
-	/*if (board->hw_id == "TL-WR841Nv13") {
-		hdr->unk1 = htonl(0x00000013);
-	} else {
-		hdr->unk1 = htonl(0);
-	} well that doesnt work for some reason*/
-	hdr->unk1 = htonl(0x00000013);     /*bad temporary hack*/
+	hdr->unk1 = htonl(unk1);
 	hdr->unk2 = htonl(0);
 	hdr->unk3 = htonl(0xffffffff);
 	hdr->unk4 = htons(0x55aa);

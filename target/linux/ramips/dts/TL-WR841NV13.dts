@@ -64,7 +64,7 @@
 &pinctrl {
 	state_default: pinctrl0 {
 		gpio {
-			ralink,group = "i2c", "i2s", "uart1", "uart2", "p0led_an", "p2led_an" ;
+			ralink,group = "i2c", "i2s", "uart1", "uart2", "p0led_kn";
 			ralink,function = "gpio";
 		};
 	};
@@ -110,8 +110,8 @@
 			read-only;
 		};
 
-		partition@07f0000 {
-			label = "radio";
+		radio: partition@07f0000 {
+		label = "radio";
 			reg = <0x7f0000 0x10000>;
 			read-only;
 		};
@@ -133,6 +133,7 @@
 &wmac {
 	status = "okay";
 	mtd-mac-address = <&factory 0xf100>;
+	mediatek,mtd-eeprom = <&radio 0x0000>;
 };
 
 &ethernet {
